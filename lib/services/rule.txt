@@ -1,0 +1,39 @@
+{
+  "rules": {
+    ".read": "auth.uid != null",
+    "products": {
+      ".indexOn": "creatorId",
+        "$productId":{
+          ".validate": "newData.hasChildren(['creatorId','title','description','imageUrl','price','author','publishedDate','category'])",
+            ".write":"!data.exists() || data.child('creatorId').val() == auth.uid"
+        }
+    },
+    "userFavorites":{
+      "$uid":{
+        ".read": "$uid == auth.uid",
+        ".write": "$uid == auth.uid"
+      }
+    },
+    "orders": {
+      ".indexOn": "userId",
+      "$orderId": {
+        ".validate": "newData.hasChildren(['amount', 'products', 'dateTime'])",
+        ".write": "auth.uid != null && (!data.exists() || data.child('userId').val() == auth.uid)"
+      }
+    },
+    "cart": {
+  "$uid": {
+    ".read": "$uid === auth.uid",
+    ".write": "$uid === auth.uid",
+    ".validate": "auth.uid !== null && $uid === auth.uid",
+    "$cartItemId": {
+      ".validate": "newData.hasChildren(['productId','title','price','quantity','imageUrl','author','publishedDate','category']) && (data.exists() ? data.child('userId').val() === auth.uid : true)",
+      ".write": "auth.uid !== null && (!data.exists() || data.child('userId').val() === auth.uid)"
+    }
+  }
+}
+
+
+
+  }
+}
